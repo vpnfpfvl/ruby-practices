@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'optparse'
+require 'etc'
 
 def main
   file_data = make_list(optparse)
@@ -58,10 +59,10 @@ def make_long_info(files)
       filetype(stat),
       "#{permission(stat)} ",
       "#{stat.nlink.to_s.rjust(2)} ", # rjustの幅はざっくりです
-      "#{stat.uid.to_s.rjust(5)} ",   # ファイルによってはレイアウトが崩れるかもしれません
-      "#{stat.gid.to_s.rjust(5)} ",
-      "#{stat.size.to_s.rjust(9)} ",
-      "#{stat.mtime} ",
+      "#{user(stat).rjust(6)} ",   # ファイルによってはレイアウトが崩れるかもしれません
+      "#{group(stat).rjust(5)} ",
+      "#{stat.size.to_s.rjust(7)} ",
+      "#{time(stat)} ",
       file
     ].join
   end
@@ -83,6 +84,19 @@ def permission(stat)
     trance_rwx(filemode.to_s[-1])
   ]
   result.join
+end
+
+def user(stat)
+  p Etc.getpwuid(stat.uid)
+  Etc.getpwuid(stat.uid).to_s.scan(/Passwd name="(.+)", passwd/).join
+end
+
+def group(stat)
+  Etc.getgrgid(stat.gid).to_s.scan(/Group name="(.+)", passwd/).join
+end
+
+def time(stat)
+  stat.mtime.strftime('%m %d %Y')
 end
 
 def trance_rwx(num)
