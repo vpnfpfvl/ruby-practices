@@ -3,17 +3,17 @@
 require 'optparse'
 
 def main
+  file_data = make_list(optparse)
+  puts file_data
+end
+
+def optparse
+  opt = OptionParser.new
   param = {
     all_file: false,
     reverse: false,
     long_info: false
   }
-  file_data = make_list(optparse(param))
-  puts file_data
-end
-
-def optparse(param)
-  opt = OptionParser.new
   opt.on('-a') { param[:all_file] = true }
   opt.on('-r') { param[:reverse] = true }
   opt.on('-l') { param[:long_info] = true }
@@ -22,19 +22,12 @@ def optparse(param)
 end
 
 def make_list(param)
-  result = generate_table(read_files(param)) if param[:long_info] == false
-  result = make_long_info(read_files(param)) if param[:long_info] == true
-  result
+  param[:long_info] ? make_long_info(read_files(param)) : generate_table(read_files(param))
 end
 
 def read_files(param)
-  list = []
-  Dir.foreach('.') { |item| list << item }
-  list.delete_if { |file| file[0] == '.' } if param[:all_file] == false # ファイル名の先頭が.ならリストから削除
-  case param[:reverse]
-  when true then list.sort.reverse
-  when false then list.sort
-  end
+  list = (param[:all_file] ? Dir.glob('*', File::FNM_DOTMATCH) : Dir.glob('*'))
+  param[:reverse] ? list.sort.reverse : list.sort
 end
 
 def generate_table(list)
