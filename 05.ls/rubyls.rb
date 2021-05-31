@@ -87,7 +87,6 @@ def permission(stat)
 end
 
 def user(stat)
-  p Etc.getpwuid(stat.uid)
   Etc.getpwuid(stat.uid).to_s.scan(/Passwd name="(.+)", passwd/).join
 end
 
