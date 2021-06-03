@@ -30,17 +30,23 @@ def analyze_argv(text)
 end
 
 def count_element(text)
-  elements = {}
-  elements[:lines] = text.count("\n")
-  elements[:words] = text.split(/\s+/).delete_if(&:empty?).count
-  elements[:size] = text.size
-  elements
+  {
+    lines: text.count("\n"),
+    words: text.split(/\s+/).delete_if(&:empty?).count,
+    size: text.size
+  }
 end
 
 def main
-  analyze_input if ARGV.empty? && !FileTest.pipe?($stdin)
-  analyze_file(ARGV) unless ARGV.empty?
-  analyze_argv($stdin.read) if FileTest.pipe?($stdin)
+  unless ARGV.empty?
+    analyze_file(ARGV)
+  else
+    if FileTest.pipe?($stdin)
+      analyze_argv($stdin.read)
+    else
+      analyze_input
+    end
+  end
 end
 
 main
