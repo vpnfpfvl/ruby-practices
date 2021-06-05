@@ -38,14 +38,12 @@ def count_element(text)
 end
 
 def main
-  unless ARGV.empty?
+  if ARGV.any?
     analyze_file(ARGV)
+  elsif FileTest.pipe?($stdin)
+    analyze_argv($stdin.read)
   else
-    if FileTest.pipe?($stdin)
-      analyze_argv($stdin.read)
-    else
-      analyze_input
-    end
+    analyze_input
   end
 end
 
